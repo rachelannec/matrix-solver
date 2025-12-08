@@ -33,87 +33,110 @@ export const addRows = (
     return result;
 };
 
-// Gaussian Elimination with steps
+// Helper: Round small numbers to zero
+const cleanNumber = (num: number, tolerance: number = 1e-10): number => {
+    return Math.abs(num) < tolerance ? 0 : num;
+};
+
+const cleanMatrix = (matrix: number[][]): number[][] => {
+    return matrix.map(row => row.map(val => cleanNumber(val)));
+};
+
+// Gaussian Elimination (Row Echelon Form)
 export const gaussianElimination = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
     const steps: Step[] = [];
-    let matrix = copyMatrix(inputMatrix);
+    let matrix = cleanMatrix(copyMatrix(inputMatrix));
     const n = matrix.length;
+    const m = matrix[0].length;
     
     steps.push({
-        description: 'Starting matrix',
+        description: 'Starting matrix (Gaussian Elimination)',
         matrix: copyMatrix(matrix),
     });
 
-    // Forward elimination
-    for (let i = 0; i < n; i++) {
-        // Find pivot
-        let maxRow = i;
-        for (let k = i + 1; k < n; k++) {
-            if (Math.abs(matrix[k][i]) > Math.abs(matrix[maxRow][i])) {
-                maxRow = k;
+    let currentRow = 0;
+
+    // Forward elimination - create row echelon form
+    for (let col = 0; col < Math.min(n, m - 1); col++) {
+        if (currentRow >= n) break;
+
+        // Find pivot (largest absolute value in column)
+        let pivotRow = currentRow;
+        let maxVal = Math.abs(matrix[currentRow][col]);
+        
+        for (let row = currentRow + 1; row < n; row++) {
+            if (Math.abs(matrix[row][col]) > maxVal) {
+                maxVal = Math.abs(matrix[row][col]);
+                pivotRow = row;
             }
         }
 
-        // Swap rows if needed
-        if (maxRow !== i) {
-            matrix = swapRows(matrix, i, maxRow);
+        // Skip column if all zeros
+        if (Math.abs(matrix[pivotRow][col]) < 1e-10) {
             steps.push({
-                description: `Swap Row ${i + 1} with Row ${maxRow + 1}`,
+                description: `Column ${col + 1} has all zeros below row ${currentRow + 1}, skipping`,
                 matrix: copyMatrix(matrix),
-                highlightedRows: [i, maxRow],
-                operation: 'swap'
-            });
-        }
-
-        // Check for zero pivot
-        if (Math.abs(matrix[i][i]) < 1e-10) {
-            steps.push({
-                description: `Pivot at position (${i + 1}, ${i + 1}) is zero. Matrix may be singular.`,
-                matrix: copyMatrix(matrix),
-                highlightedRows: [i]
+                highlightedRows: [currentRow]
             });
             continue;
         }
 
-        // Make pivot = 1
-        const pivot = matrix[i][i];
-        if (Math.abs(pivot - 1) > 1e-10) {
-            matrix = multiplyRow(matrix, i, 1 / pivot);
+        // Swap rows if needed
+        if (pivotRow !== currentRow) {
+            matrix = swapRows(matrix, currentRow, pivotRow);
             steps.push({
-                description: `Divide Row ${i + 1} by ${pivot.toFixed(3)}`,
+                description: `Swap Row ${currentRow + 1} ↔ Row ${pivotRow + 1} (pivot selection)`,
                 matrix: copyMatrix(matrix),
-                highlightedRows: [i],
+                highlightedRows: [currentRow, pivotRow],
+                operation: 'swap'
+            });
+        }
+
+        // Scale pivot to 1
+        const pivot = matrix[currentRow][col];
+        if (Math.abs(pivot - 1) > 1e-10) {
+            matrix = multiplyRow(matrix, currentRow, 1 / pivot);
+            matrix = cleanMatrix(matrix);
+            steps.push({
+                description: `R${currentRow + 1} → (1/${pivot.toFixed(3)})R${currentRow + 1}`,
+                matrix: copyMatrix(matrix),
+                highlightedRows: [currentRow],
                 operation: 'multiply'
             });
         }
 
         // Eliminate below pivot
-        for (let k = i + 1; k < n; k++) {
-            const factor = matrix[k][i];
+        for (let row = currentRow + 1; row < n; row++) {
+            const factor = matrix[row][col];
             if (Math.abs(factor) > 1e-10) {
-                matrix = addRows(matrix, k, i, -factor);
+                matrix = addRows(matrix, row, currentRow, -factor);
+                matrix = cleanMatrix(matrix);
                 steps.push({
-                    description: `Row ${k + 1} = Row ${k + 1} - (${factor.toFixed(3)}) × Row ${i + 1}`,
+                    description: `R${row + 1} → R${row + 1} - (${factor.toFixed(3)})R${currentRow + 1}`,
                     matrix: copyMatrix(matrix),
-                    highlightedRows: [i, k],
+                    highlightedRows: [currentRow, row],
                     operation: 'add'
                 });
             }
         }
+
+        currentRow++;
     }
 
-    // Back substitution
-    const solution: number[] = new Array(n).fill(0);
-    const cols = matrix[0].length;
-    
-    if (cols === n + 1) {
-        // Augmented matrix - solve for variables
+    steps.push({
+        description: 'Row Echelon Form achieved',
+        matrix: copyMatrix(matrix),
+    });
+
+    // Back substitution for augmented matrices
+    const solution: number[] = [];
+    if (m === n + 1) {
         for (let i = n - 1; i >= 0; i--) {
-            solution[i] = matrix[i][cols - 1];
+            let sum = matrix[i][m - 1];
             for (let j = i + 1; j < n; j++) {
-                solution[i] -= matrix[i][j] * solution[j];
+                sum -= matrix[i][j] * solution[n - 1 - j];
             }
-            solution[i] /= matrix[i][i];
+            solution.unshift(cleanNumber(sum / matrix[i][i]));
         }
     }
 
@@ -121,57 +144,275 @@ export const gaussianElimination = (inputMatrix: number[][]): { steps: Step[], r
         steps,
         result: {
             finalMatrix: matrix,
-            solution: cols === n + 1 ? solution : undefined
+            solution: solution.length > 0 ? solution : undefined
         }
     };
 };
 
-// Calculate determinant using cofactor expansion
-export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
+// Gauss-Jordan Elimination (Reduced Row Echelon Form - RREF)
+export const gaussJordan = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
     const steps: Step[] = [];
-    const n = inputMatrix.length;
-
+    let matrix = cleanMatrix(copyMatrix(inputMatrix));
+    const n = matrix.length;
+    const m = matrix[0].length;
+    
     steps.push({
-        description: 'Calculating determinant',
-        matrix: copyMatrix(inputMatrix),
+        description: 'Starting matrix (Gauss-Jordan Elimination)',
+        matrix: copyMatrix(matrix),
     });
 
-    const det = determinantRecursive(inputMatrix, steps);
+    let lead = 0;
+
+    for (let row = 0; row < n; row++) {
+        if (lead >= m) break;
+
+        // Find pivot
+        let pivotRow = row;
+        while (Math.abs(matrix[pivotRow][lead]) < 1e-10) {
+            pivotRow++;
+            if (pivotRow === n) {
+                pivotRow = row;
+                lead++;
+                if (lead === m) break;
+            }
+        }
+
+        if (lead === m) break;
+
+        // Swap rows if needed
+        if (pivotRow !== row) {
+            matrix = swapRows(matrix, row, pivotRow);
+            steps.push({
+                description: `Swap Row ${row + 1} ↔ Row ${pivotRow + 1}`,
+                matrix: copyMatrix(matrix),
+                highlightedRows: [row, pivotRow],
+                operation: 'swap'
+            });
+        }
+
+        // Scale pivot to 1
+        const pivot = matrix[row][lead];
+        if (Math.abs(pivot) > 1e-10 && Math.abs(pivot - 1) > 1e-10) {
+            matrix = multiplyRow(matrix, row, 1 / pivot);
+            matrix = cleanMatrix(matrix);
+            steps.push({
+                description: `R${row + 1} → (1/${pivot.toFixed(3)})R${row + 1}`,
+                matrix: copyMatrix(matrix),
+                highlightedRows: [row],
+                operation: 'multiply'
+            });
+        }
+
+        // Eliminate ALL other rows (above and below)
+        for (let i = 0; i < n; i++) {
+            if (i !== row) {
+                const factor = matrix[i][lead];
+                if (Math.abs(factor) > 1e-10) {
+                    matrix = addRows(matrix, i, row, -factor);
+                    matrix = cleanMatrix(matrix);
+                    steps.push({
+                        description: `R${i + 1} → R${i + 1} - (${factor.toFixed(3)})R${row + 1}`,
+                        matrix: copyMatrix(matrix),
+                        highlightedRows: [row, i],
+                        operation: 'add'
+                    });
+                }
+            }
+        }
+
+        lead++;
+    }
+
+    steps.push({
+        description: 'Reduced Row Echelon Form (RREF) achieved',
+        matrix: copyMatrix(matrix),
+    });
+
+    // Extract solution for augmented matrices
+    const solution: number[] = [];
+    if (m === n + 1) {
+        for (let i = 0; i < n; i++) {
+            solution.push(cleanNumber(matrix[i][m - 1]));
+        }
+    }
 
     return {
         steps,
         result: {
-            finalMatrix: inputMatrix,
-            determinant: det
+            finalMatrix: matrix,
+            solution: solution.length > 0 ? solution : undefined
         }
     };
 };
 
-const determinantRecursive = (matrix: number[][], steps: Step[]): number => {
+// Calculate determinant using row operations (more educational than cofactor)
+export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
+    const steps: Step[] = [];
+    let matrix = cleanMatrix(copyMatrix(inputMatrix));
     const n = matrix.length;
-
-    if (n === 1) return matrix[0][0];
-    if (n === 2) {
-        const det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    
+    if (n !== matrix[0].length) {
         steps.push({
-            description: `2×2 determinant = (${matrix[0][0]} × ${matrix[1][1]}) - (${matrix[0][1]} × ${matrix[1][0]}) = ${det.toFixed(3)}`,
-            matrix: copyMatrix(matrix)
+            description: 'Error: Matrix must be square to calculate determinant',
+            matrix: copyMatrix(matrix),
         });
-        return det;
+        return {
+            steps,
+            result: {
+                finalMatrix: matrix,
+                determinant: NaN
+            }
+        };
     }
 
-    let det = 0;
-    for (let j = 0; j < n; j++) {
-        const minor = getMinor(matrix, 0, j);
-        const cofactor = Math.pow(-1, j) * matrix[0][j] * determinantRecursive(minor, steps);
-        det += cofactor;
+    steps.push({
+        description: 'Starting matrix (Determinant calculation using row operations)',
+        matrix: copyMatrix(matrix),
+    });
+
+    let determinant = 1;
+    let swapCount = 0;
+
+    // Forward elimination with determinant tracking
+    for (let col = 0; col < n; col++) {
+        // Find pivot
+        let pivotRow = col;
+        for (let row = col + 1; row < n; row++) {
+            if (Math.abs(matrix[row][col]) > Math.abs(matrix[pivotRow][col])) {
+                pivotRow = row;
+            }
+        }
+
+        // Check for zero pivot
+        if (Math.abs(matrix[pivotRow][col]) < 1e-10) {
+            steps.push({
+                description: 'Determinant is 0 (column of zeros found)',
+                matrix: copyMatrix(matrix),
+                highlightedRows: [col]
+            });
+            return {
+                steps,
+                result: {
+                    finalMatrix: matrix,
+                    determinant: 0
+                }
+            };
+        }
+
+        // Swap if needed
+        if (pivotRow !== col) {
+            matrix = swapRows(matrix, col, pivotRow);
+            swapCount++;
+            determinant *= -1;
+            steps.push({
+                description: `Swap Row ${col + 1} ↔ Row ${pivotRow + 1} (det multiplied by -1)`,
+                matrix: copyMatrix(matrix),
+                highlightedRows: [col, pivotRow],
+                operation: 'swap'
+            });
+        }
+
+        // Track pivot in determinant
+        const pivot = matrix[col][col];
+        determinant *= pivot;
+
+        steps.push({
+            description: `Pivot at (${col + 1}, ${col + 1}) = ${pivot.toFixed(3)}, det = ${determinant.toFixed(3)}`,
+            matrix: copyMatrix(matrix),
+            highlightedRows: [col]
+        });
+
+        // Eliminate below
+        for (let row = col + 1; row < n; row++) {
+            const factor = matrix[row][col] / pivot;
+            if (Math.abs(factor) > 1e-10) {
+                matrix = addRows(matrix, row, col, -factor);
+                matrix = cleanMatrix(matrix);
+                steps.push({
+                    description: `R${row + 1} → R${row + 1} - (${factor.toFixed(3)})R${col + 1}`,
+                    matrix: copyMatrix(matrix),
+                    highlightedRows: [col, row]
+                });
+            }
+        }
     }
 
-    return det;
+    determinant = cleanNumber(determinant);
+
+    steps.push({
+        description: `Final determinant = ${determinant.toFixed(3)}`,
+        matrix: copyMatrix(matrix),
+    });
+
+    return {
+        steps,
+        result: {
+            finalMatrix: matrix,
+            determinant
+        }
+    };
 };
 
-const getMinor = (matrix: number[][], row: number, col: number): number[][] => {
-    return matrix
-        .filter((_, i) => i !== row)
-        .map(r => r.filter((_, j) => j !== col));
+// Matrix Inverse using Gauss-Jordan
+export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
+    const steps: Step[] = [];
+    const n = inputMatrix.length;
+    
+    if (n !== inputMatrix[0].length) {
+        steps.push({
+            description: 'Error: Matrix must be square to find inverse',
+            matrix: copyMatrix(inputMatrix),
+        });
+        return {
+            steps,
+            result: { finalMatrix: inputMatrix }
+        };
+    }
+
+    // Create augmented matrix [A | I]
+    const augmented: number[][] = inputMatrix.map((row, i) => [
+        ...row,
+        ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0))
+    ]);
+
+    steps.push({
+        description: 'Augmented matrix [A | I]',
+        matrix: copyMatrix(augmented),
+    });
+
+    // Apply Gauss-Jordan to get [I | A^(-1)]
+    const result = gaussJordan(augmented);
+    
+    // Extract inverse from right side
+    const inverse = result.result.finalMatrix.map(row => row.slice(n));
+    
+    // Check if we got identity on left side
+    const isIdentity = result.result.finalMatrix.every((row, i) => 
+        row.slice(0, n).every((val, j) => Math.abs(val - (i === j ? 1 : 0)) < 1e-10)
+    );
+
+    if (!isIdentity) {
+        steps.push(...result.steps);
+        steps.push({
+            description: 'Matrix is singular (not invertible)',
+            matrix: result.result.finalMatrix
+        });
+        return {
+            steps,
+            result: { finalMatrix: result.result.finalMatrix }
+        };
+    }
+
+    steps.push(...result.steps);
+    steps.push({
+        description: 'Inverse matrix extracted',
+        matrix: inverse
+    });
+
+    return {
+        steps,
+        result: {
+            finalMatrix: inverse
+        }
+    };
 };
