@@ -11,10 +11,41 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [useLatex, setUseLatex] = useState<boolean>(true);
 
+    // Helper function to parse description and render LaTeX inline
+    const renderDescription = (description: string) => {
+        if (!description || description.trim() === '') {
+            return <div style={{ fontStyle: 'italic', color: '#999' }}>No description available</div>;
+        }
+
+        if (!useLatex) {
+            return <div style={{ whiteSpace: 'pre-line' }}>{description}</div>;
+        }
+
+        // Split by LaTeX delimiters $...$ for inline math
+        const parts = description.split(/(\$[^$]+\$)/g);
+        
+        return (
+            <div style={{ whiteSpace: 'pre-line' }}>
+                {parts.map((part, index) => {
+                    if (part.startsWith('$') && part.endsWith('$')) {
+                        // Extract LaTeX content (remove the $ delimiters)
+                        const latex = part.slice(1, -1);
+                        return (
+                            <span key={index} style={{ display: 'inline-block', margin: '0 4px', verticalAlign: 'middle' }}>
+                                <LaTeXRenderer latex={latex} />
+                            </span>
+                        );
+                    }
+                    return <span key={index}>{part}</span>;
+                })}
+            </div>
+        );
+    };
+
     const renderMatrix = (matrix: number[][], highlightedRows?: number[]) => {
         if (useLatex) {
             return (
-                <div style={{ margin: '20px 0' }}>
+                <div style={{ margin: '20px 0', overflow: 'auto' }}>
                     <LaTeXRenderer latex={matrixToLatex(matrix)} display={true} />
                 </div>
             );
@@ -73,11 +104,12 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
             <h2>Solution Steps</h2>
             
             <div style={{ marginBottom: '20px' }}>
-                <label style={{ marginRight: '20px' }}>
+                <label style={{ marginRight: '20px', cursor: 'pointer' }}>
                     <input 
                         type="checkbox" 
                         checked={useLatex}
                         onChange={(e) => setUseLatex(e.target.checked)}
+                        style={{ cursor: 'pointer' }}
                     />
                     {' '}Use LaTeX Rendering
                 </label>
@@ -121,14 +153,15 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                 <h3 style={{ color: '#667eea', marginBottom: '15px' }}>
                     Step {currentStep + 1}
                 </h3>
-                <p style={{ 
-                    fontSize: '18px', 
+                <div style={{ 
+                    fontSize: '16px', 
                     marginBottom: '20px',
-                    fontWeight: '500',
-                    color: '#333'
+                    color: '#333',
+                    lineHeight: '1.8',
+                    minHeight: '40px'
                 }}>
-                    {steps[currentStep].description}
-                </p>
+                    {renderDescription(steps[currentStep].description)}
+                </div>
                 {renderMatrix(steps[currentStep].matrix, steps[currentStep].highlightedRows)}
             </div>
 
@@ -136,40 +169,49 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                 <h4 style={{ marginBottom: '10px' }}>All Steps:</h4>
                 <ol style={{ 
                     textAlign: 'left', 
-                    maxHeight: '250px', 
+                    maxHeight: '300px', 
                     overflowY: 'auto',
                     backgroundColor: '#fafafa',
                     padding: '15px 15px 15px 35px',
                     borderRadius: '5px',
                     border: '1px solid #e0e0e0'
                 }}>
-                    {steps.map((step, index) => (
-                        <li 
-                            key={index}
-                            onClick={() => setCurrentStep(index)}
-                            style={{ 
-                                cursor: 'pointer',
-                                padding: '8px 10px',
-                                backgroundColor: index === currentStep ? '#e3f2fd' : 'transparent',
-                                marginBottom: '5px',
-                                borderRadius: '4px',
-                                transition: 'background-color 0.2s',
-                                borderLeft: index === currentStep ? '3px solid #667eea' : '3px solid transparent'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (index !== currentStep) {
-                                    e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (index !== currentStep) {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                }
-                            }}
-                        >
-                            {step.description}
-                        </li>
-                    ))}
+                    {steps.map((step, index) => {
+                        // Get first line of description, removing LaTeX
+                        const preview = step.description
+                            .replace(/\$[^$]+\$/g, '')
+                            .split('\n')
+                            .filter(line => line.trim() !== '')
+                            [0] || 'Step ' + (index + 1);
+
+                        return (
+                            <li 
+                                key={index}
+                                onClick={() => setCurrentStep(index)}
+                                style={{ 
+                                    cursor: 'pointer',
+                                    padding: '8px 10px',
+                                    backgroundColor: index === currentStep ? '#e3f2fd' : 'transparent',
+                                    marginBottom: '5px',
+                                    borderRadius: '4px',
+                                    transition: 'background-color 0.2s',
+                                    borderLeft: index === currentStep ? '3px solid #667eea' : '3px solid transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (index !== currentStep) {
+                                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (index !== currentStep) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }
+                                }}
+                            >
+                                {preview}
+                            </li>
+                        );
+                    })}
                 </ol>
             </div>
         </div>
