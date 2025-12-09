@@ -1,0 +1,95 @@
+.explanation-tab {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    color: #fff;
+}
+
+.explanation-tab h1 {
+    color: #eaa866;
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 36px;
+}
+
+.explanation-section {
+    margin-bottom: 50px;
+}
+
+.explanation-section h2 {
+    color: #ffc994;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #eaa866;
+}
+
+.explanation-section p {
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.explanation-section ol, .explanation-section ul {
+    line-height: 2;
+    color: #555;
+}
+
+.starting-section p, .starting-section ol{
+    color: #fff;
+}
+
+.operation-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.operation-card:hover {
+    transform: translateY(-5px);
+}
+
+.operation-card h3 {
+    color: #eaa866;
+    margin-bottom: 15px;
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tips-list li {
+    background: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid #eaa866;
+    border-radius: 5px;
+}
+
+.example-box {
+    background: #50462c;
+    color: #ecf0f1;
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.example-box p {
+    color: #fff;
+}
+
+.example-box h4 {
+    color: #db9e34;
+    margin-bottom: 15px;
+}
+
+.example-box pre {
+    background: #5e5434;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    line-height: 1.6;
+}
