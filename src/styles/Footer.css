@@ -1,6 +1,5 @@
 .footer {
     background: linear-gradient(135deg, #50452c 0%, #5f4e35 100%);
-    color: #ecf0f1;
     margin-top: 60px;
 }
 
@@ -35,6 +34,7 @@
 .footer-section ul {
     list-style: none;
     padding: 0;
+    color: #bdc3c7;
 }
 
 .footer-section li {
