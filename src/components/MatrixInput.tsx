@@ -66,7 +66,7 @@ const MatrixInput: React.FC<MatrixInputProps> = ({ onMatrixInput }) => {
         <div className="matrix-input">
             <h2>Input Matrix</h2>
             
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '20px', color: '#ddd' }}>
                 <label>
                     Rows: 
                     <select 
@@ -87,7 +87,7 @@ const MatrixInput: React.FC<MatrixInputProps> = ({ onMatrixInput }) => {
                         onChange={(e) => handleDimensionChange(rows, parseInt(e.target.value))}
                         style={{ marginLeft: '10px' }}
                     >
-                        {[2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                        {[2, 3, 4, 5, 6, 7, 8].map(n => (
                             <option key={n} value={n}>{n}</option>
                         ))}
                     </select>

@@ -66,7 +66,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                                 key={rowIndex}
                                 style={{
                                     backgroundColor: highlightedRows?.includes(rowIndex) 
-                                        ? '#393729ff' 
+                                        ? '#6561478b' 
                                         : 'transparent',
                                     transition: 'background-color 0.3s'
                                 }}
