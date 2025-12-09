@@ -85,6 +85,23 @@
     font-size: 14px;
 }
 
+.footer-bottom a {
+    color: #db7a34;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 500;
+}
+
+.footer-bottom a:hover {
+    color: #fbc898;
+    text-decoration: underline;
+}
+
+.footer-bottom small {
+    margin-top: 10px;
+    display: inline-block;
+}
+
 @media (max-width: 768px) {
     .footer-container {
         grid-template-columns: 1fr;

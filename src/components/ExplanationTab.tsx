@@ -67,17 +67,17 @@ const ExplanationTab: React.FC = () => {
                     <h4>Solving a System of Equations:</h4>
                     <p>For the system:</p>
                     <pre>
-x + 2y = 4
+x + 2y = 4 <br/>
 3x + 4y = 10
                     </pre>
                     <p>Create an augmented matrix:</p>
                     <pre>
-[ 1  2 | 4 ]
+[ 1  2 | 4 ] <br/>
 [ 3  4 | 10]
                     </pre>
                     <p>Then use <strong>Gauss-Jordan</strong> to get:</p>
                     <pre>
-[ 1  0 | 2 ]  → x = 2
+[ 1  0 | 2 ]  → x = 2 <br/>
 [ 0  1 | 1 ]  → y = 1
                     </pre>
                 </div>
