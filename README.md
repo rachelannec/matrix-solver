@@ -11,7 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.2-purple.svg)](https://vitejs.dev/)
 
-[Report Bug](#) | [Request Feature](#)
+[Report Bug](https://github.com/rachelannec/matrix-solver/issues/new?labels=bug&template=bug_report.md) | [Request Feature](https://github.com/rachelannec/matrix-solver/issues/new?labels=enhancement&template=feature_request.md)
 
 </div>
 
@@ -32,7 +32,6 @@
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
 - [Acknowledgments](#acknowledgments)
 
 ---
