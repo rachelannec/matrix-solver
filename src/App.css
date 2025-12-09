@@ -48,6 +48,7 @@ h2 {
 .matrix-input, .operation-selector, .step-visualization, .solution-display {
     margin-bottom: 30px;
     text-align: center;
+    color: #333;
 }
 
 .error {

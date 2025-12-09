@@ -14,7 +14,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
     // Helper function to parse description and render LaTeX inline
     const renderDescription = (description: string) => {
         if (!description || description.trim() === '') {
-            return <div style={{ fontStyle: 'italic', color: '#999' }}>No description available</div>;
+            return <div style={{ fontStyle: 'italic', color: '#222' }}>No description available</div>;
         }
 
         if (!useLatex) {
@@ -66,7 +66,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                                 key={rowIndex}
                                 style={{
                                     backgroundColor: highlightedRows?.includes(rowIndex) 
-                                        ? '#fff9c4' 
+                                        ? '#393729ff' 
                                         : 'transparent',
                                     transition: 'background-color 0.3s'
                                 }}
@@ -104,7 +104,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
             <h2>Solution Steps</h2>
             
             <div style={{ marginBottom: '20px' }}>
-                <label style={{ marginRight: '20px', cursor: 'pointer' }}>
+                <label style={{ marginRight: '20px', cursor: 'pointer', color: '#eee' }}>
                     <input 
                         type="checkbox" 
                         checked={useLatex}
@@ -128,7 +128,8 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                 <span style={{ 
                     margin: '0 20px',
                     fontSize: '16px',
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    color: '#eee'
                 }}>
                     Step {currentStep + 1} of {steps.length}
                 </span>
@@ -150,7 +151,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                 minHeight: '250px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}>
-                <h3 style={{ color: '#667eea', marginBottom: '15px' }}>
+                <h3 style={{ color: '#cda95cff', marginBottom: '15px' }}>
                     Step {currentStep + 1}
                 </h3>
                 <div style={{ 
@@ -166,7 +167,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
             </div>
 
             <div style={{ marginTop: '25px' }}>
-                <h4 style={{ marginBottom: '10px' }}>All Steps:</h4>
+                <h4 style={{ marginBottom: '10px', color: '#eee'}}>All Steps:</h4>
                 <ol style={{ 
                     textAlign: 'left', 
                     maxHeight: '300px', 
