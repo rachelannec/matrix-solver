@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Step } from '../types/matrix';
-import { formatNumber, matrixToLatex } from '../utils/mathFormatter';
+import { formatNumber } from '../utils/mathFormatter';
 import LaTeXRenderer from './LaTeXRenderer';
 
 interface StepVisualizationProps {
@@ -43,14 +43,6 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
     };
 
     const renderMatrix = (matrix: number[][], highlightedRows?: number[]) => {
-        if (useLatex) {
-            return (
-                <div style={{ margin: '20px 0', overflow: 'auto' }}>
-                    <LaTeXRenderer latex={matrixToLatex(matrix)} display={true} />
-                </div>
-            );
-        }
-
         return (
             <div style={{ 
                 display: 'inline-block', 

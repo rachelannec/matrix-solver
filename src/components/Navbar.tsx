@@ -35,7 +35,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
                             setIsMenuOpen(false);
                         }}
                     >
-                        <span className="nav-icon">⚙️</span>
+                        {/* <span className="nav-icon">⚙️</span> */}
                         Solver
                     </button>
                     <button
@@ -45,7 +45,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
                             setIsMenuOpen(false);
                         }}
                     >
-                        <span className="nav-icon">📚</span>
+                        {/* TODO (or not): better icons */}
+                        {/* <span className="nav-icon">📚</span> */}
                         Explanation
                     </button>
                     <button
@@ -55,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
                             setIsMenuOpen(false);
                         }}
                     >
-                        <span className="nav-icon">ℹ️</span>
+                        {/* <span className="nav-icon">ℹ️</span> */}
                         About
                     </button>
                 </div>
