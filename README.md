@@ -327,6 +327,7 @@ matrix-solver/
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
+├── CHANGELOG.md
 └── README.md
 ```
 
