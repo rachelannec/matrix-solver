@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Step } from '../types/matrix';
 import { formatNumber } from '../utils/mathFormatter';
-import LaTeXRenderer from './LaTeXRenderer';
+// import LaTeXRenderer from './LaTeXRenderer';
 
 interface StepVisualizationProps {
     steps: Step[];
@@ -9,38 +9,38 @@ interface StepVisualizationProps {
 
 const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const [useLatex, setUseLatex] = useState<boolean>(true);
+    // const [useLatex, setUseLatex] = useState<boolean>(true);
 
     // Helper function to parse description and render LaTeX inline
-    const renderDescription = (description: string) => {
-        if (!description || description.trim() === '') {
-            return <div style={{ fontStyle: 'italic', color: '#222' }}>No description available</div>;
-        }
+    // const renderDescription = (description: string) => {
+    //     if (!description || description.trim() === '') {
+    //         return <div style={{ fontStyle: 'italic', color: '#222' }}>No description available</div>;
+    //     }
 
-        if (!useLatex) {
-            return <div style={{ whiteSpace: 'pre-line' }}>{description}</div>;
-        }
+    //     if (!useLatex) {
+    //         return <div style={{ whiteSpace: 'pre-line' }}>{description}</div>;
+    //     }
 
-        // Split by LaTeX delimiters $...$ for inline math
-        const parts = description.split(/(\$[^$]+\$)/g);
+    //     // Split by LaTeX delimiters $...$ for inline math
+    //     const parts = description.split(/(\$[^$]+\$)/g);
         
-        return (
-            <div style={{ whiteSpace: 'pre-line' }}>
-                {parts.map((part, index) => {
-                    if (part.startsWith('$') && part.endsWith('$')) {
-                        // Extract LaTeX content (remove the $ delimiters)
-                        const latex = part.slice(1, -1);
-                        return (
-                            <span key={index} style={{ display: 'inline-block', margin: '0 4px', verticalAlign: 'middle' }}>
-                                <LaTeXRenderer latex={latex} />
-                            </span>
-                        );
-                    }
-                    return <span key={index}>{part}</span>;
-                })}
-            </div>
-        );
-    };
+    //     return (
+    //         <div style={{ whiteSpace: 'pre-line' }}>
+    //             {parts.map((part, index) => {
+    //                 if (part.startsWith('$') && part.endsWith('$')) {
+    //                     // Extract LaTeX content (remove the $ delimiters)
+    //                     const latex = part.slice(1, -1);
+    //                     return (
+    //                         <span key={index} style={{ display: 'inline-block', margin: '0 4px', verticalAlign: 'middle' }}>
+    //                             <LaTeXRenderer latex={latex} />
+    //                         </span>
+    //                     );
+    //                 }
+    //                 return <span key={index}>{part}</span>;
+    //             })}
+    //         </div>
+    //     );
+    // };
 
     const renderMatrix = (matrix: number[][], highlightedRows?: number[]) => {
         return (
@@ -95,7 +95,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
         <div className="step-visualization">
             <h2>Solution Steps</h2>
             
-            <div style={{ marginBottom: '20px' }}>
+            {/* <div style={{ marginBottom: '20px' }}>
                 <label style={{ marginRight: '20px', cursor: 'pointer', color: '#eee' }}>
                     <input 
                         type="checkbox" 
@@ -105,7 +105,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                     />
                     {' '}Use LaTeX Rendering
                 </label>
-            </div>
+            </div> */}
             
             <div style={{ marginBottom: '20px' }}>
                 <button 
@@ -153,7 +153,7 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                     lineHeight: '1.8',
                     minHeight: '40px'
                 }}>
-                    {renderDescription(steps[currentStep].description)}
+                    {/* {renderDescription(steps[currentStep].description)} */}
                 </div>
                 {renderMatrix(steps[currentStep].matrix, steps[currentStep].highlightedRows)}
             </div>
