@@ -56,3 +56,67 @@ h2 {
     font-size: 14px;
     margin-top: 10px;
 }
+
+/* Two-column layout for solver */
+.solver-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Desktop/Laptop view - 2 columns */
+@media (min-width: 1024px) {
+    .solver-layout {
+        grid-template-columns: 450px 1fr;
+        gap: 40px;
+    }
+
+    .input-column {
+        position: sticky;
+        top: 150px;
+        height: fit-content;
+        /* Removed max-height and overflow-y to prevent scrolling */
+    }
+
+    .output-column {
+        min-width: 0; /* Allows proper text wrapping */
+    }
+}
+
+/* Tablet view - still single column */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .solver-layout {
+        grid-template-columns: 1fr;
+        max-width: 800px;
+    }
+}
+
+/* Mobile view - single column */
+@media (max-width: 767px) {
+    .solver-layout {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        gap: 20px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+}
+
+.input-column {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.output-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}

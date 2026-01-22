@@ -64,14 +64,26 @@ function App() {
             <div className="container">
                 {currentTab === 'solver' && (
                     <>
-                        <h1>Linear Algebra Visualization Tool</h1>
-                        <OperationSelector 
-                            selectedOperation={operation} 
-                            onOperationChange={setOperation} 
-                        />
-                        <MatrixInput onMatrixInput={handleMatrixInput} />
-                        {steps.length > 0 && <StepVisualization steps={steps} />}
-                        {solution && <SolutionDisplay solution={solution} />}
+                        {/* <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '32px' }}>
+                            Matrix Solver
+                        </h1> */}
+                        
+                        <div className="solver-layout">
+                            {/* Left Column: Input */}
+                            <div className="input-column">
+                                <OperationSelector 
+                                    selectedOperation={operation} 
+                                    onOperationChange={setOperation} 
+                                />
+                                <MatrixInput onMatrixInput={handleMatrixInput} />
+                            </div>
+
+                            {/* Right Column: Steps & Solution */}
+                            <div className="output-column">
+                                {steps.length > 0 && <StepVisualization steps={steps} />}
+                                {solution && <SolutionDisplay solution={solution} />}
+                            </div>
+                        </div>
                     </>
                 )}
 
@@ -85,7 +97,7 @@ function App() {
                             understand linear algebra concepts through interactive visualization and 
                             step-by-step solutions.
                         </p>
-                        <p style={{ marginTop: '30px', color: '#a2624b ', fontSize: '20px', fontWeight: 'bold' }}>
+                        <p style={{ marginTop: '30px', color: '#a2624b', fontSize: '20px', fontWeight: 'bold' }}>
                             Version 1.1.0
                         </p>
                     </div>
