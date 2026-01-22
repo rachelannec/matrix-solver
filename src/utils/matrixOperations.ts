@@ -664,12 +664,11 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
  * @param inputMatrix - square matrix to invert
  * @returns 
  */
-
 export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
     const steps: Step[] = [];
     const n = inputMatrix.length;
     
-    // ----- Validation: must be sqare matrix
+    // ----- Validation: must be square matrix
     if (n !== inputMatrix[0].length) {
         steps.push({
             description: '❌ Error: Only square matrices have inverses',
@@ -677,18 +676,18 @@ export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], resu
         });
         return {
             steps,
-            result: { finalMatrix: inputMatrix }
+            result: { 
+                finalMatrix: inputMatrix,
+                error: 'Matrix must be square to have an inverse'
+            }
         };
     }
 
     // ----- Step 1: Create augmented matrix [A | I]
-    // left side: original matrix A
-    // right side: identity matrix I (1s on diagonal)
     const augmented: number[][] = inputMatrix.map((row, i) => [
-        ...row, // copy of original row
-        ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0)) // addthe identity row
+        ...row,
+        ...Array(n).fill(0).map((_, j) => (i === j ? 1 : 0))
     ]);
-    // result: 2n columns (from A and I)
 
     steps.push({
         description: '📋 Step 1: Create Augmented Matrix $[A | I]$\n' +
@@ -699,50 +698,55 @@ export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], resu
     });
 
     // ----- Step 2: Apply Gauss-Jordan to get [I | A^(-1)]
-    // use the existing gauss-jordan function!
-    // it will reduce the left side (A) to identity form
-    // also, the right side (I) becomes the inverse
     const result = gaussJordan(augmented);
     
-    // ----- Step 3: Extract inverse from right sid
-    // after gauss-jordan, columns n to 2n-1 contain A^-1
-    const inverse = result.result.finalMatrix.map(row => row.slice(n));
-    
-    // ----- Verification: Check if we got identity on left side
-    // id not, matrix is singular (non-invertible)
+    // ----- Step 3: Verification - Check if left side became identity
     const isIdentity = result.result.finalMatrix.every((row, i) => 
         row.slice(0, n).every((val, j) => 
-            // check: diagonla should be 1, off-diagonal should be 0
             Math.abs(val - (i === j ? 1 : 0)) < 1e-10)
     );
 
+    // Add the gauss-jordan steps
+    steps.push(...result.steps);
+
     if (!isIdentity) {
-        // matrix reduction failed? -> matrix is singular
-        steps.push(...result.steps);
+        // Matrix is singular - no inverse exists
         steps.push({
-            description: '❌ Matrix is NOT INVERTIBLE (Singular Matrix)\n' +
-                        'The left side could not be reduced to the identity matrix.\n' +
-                        'This means $\\det(A) = 0$ and no inverse exists.',
+            description: '❌ Matrix is NOT INVERTIBLE (Singular Matrix)\n\n' +
+                        'Why? The left side could not be reduced to the identity matrix.\n' +
+                        'This means:\n' +
+                        '• $\\det(A) = 0$\n' +
+                        '• The matrix has linearly dependent rows/columns\n' +
+                        '• No inverse exists\n' +
+                        '• The system has either no solution or infinite solutions',
             matrix: result.result.finalMatrix
         });
         return {
             steps,
-            result: { finalMatrix: result.result.finalMatrix }
+            result: { 
+                finalMatrix: result.result.finalMatrix,
+                inverse: undefined,
+                error: 'Matrix is singular (determinant = 0). No inverse exists.'
+            }
         };
     }
 
-    steps.push(...result.steps);
+    // ----- Extract inverse from right side
+    const inverse = result.result.finalMatrix.map(row => row.slice(n));
+    
     steps.push({
-        description: '🎉 Inverse Matrix Found!\n' +
+        description: '🎉 Inverse Matrix Found!\n\n' +
                     'The right side of our augmented matrix is now $A^{-1}$\n\n' +
-                    'Verification: $A \\times A^{-1} = I$ (Identity Matrix)',
+                    'Verification: $A \\times A^{-1} = I$ (Identity Matrix)\n' +
+                    'This confirms our calculation is correct!',
         matrix: inverse
     });
 
     return {
         steps,
         result: {
-            finalMatrix: inverse
+            finalMatrix: inverse,
+            inverse: inverse
         }
     };
 };

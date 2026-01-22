@@ -23,6 +23,8 @@ export interface SolutionResult {
     solution?: number[];
     determinant?: number;
     rank?: number;
+    inverse?: number[][];
+    error?: string;
     hasUniqueSolution?: boolean;
     hasInfiniteSolutions?: boolean;
     hasNoSolution?: boolean;

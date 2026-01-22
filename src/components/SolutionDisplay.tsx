@@ -7,6 +7,27 @@ interface SolutionDisplayProps {
 }
 
 const SolutionDisplay: React.FC<SolutionDisplayProps> = ({ solution }) => {
+    // Check for error first - before rendering anything else
+    if (solution.error) {
+        return (
+            <div className="solution-display">
+                <h2>❌ Error</h2>
+                <div style={{ 
+                    padding: '20px', 
+                    backgroundColor: '#ffebee', 
+                    borderLeft: '4px solid #d32f2f',
+                    borderRadius: '8px',
+                    color: '#c62828',
+                    fontSize: '18px',
+                    fontWeight: '500',
+                    marginTop: '20px'
+                }}>
+                    {solution.error}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="solution-display">
             <h2>Final Solution</h2>
@@ -45,6 +66,21 @@ const SolutionDisplay: React.FC<SolutionDisplayProps> = ({ solution }) => {
                         <div style={{ fontSize: '22px', fontWeight: 'bold' }}>
                             det(A) = {formatNumber(solution.determinant)}
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {solution.inverse && (
+                <div style={{ 
+                    marginBottom: '25px',
+                    padding: '20px',
+                    backgroundColor: '#e3f2fd',
+                    borderRadius: '8px',
+                    border: '2px solid #2196f3'
+                }}>
+                    <h3 style={{ color: '#1565c0', marginBottom: '15px' }}>Inverse Matrix (A⁻¹):</h3>
+                    <div style={{ overflowX: 'auto' }}>
+                        <LaTeXRenderer latex={matrixToLatex(solution.inverse)} display={true} />
                     </div>
                 </div>
             )}
