@@ -140,3 +140,67 @@ h2 {
     flex-direction: column;
     gap: 30px;
 }
+
+/* Matrix Input specific scrolling */
+.matrix-input {
+    margin-bottom: 30px;
+    text-align: center;
+    color: #333;
+    width: 100%;
+    overflow: visible;
+}
+
+.matrix-input form {
+    width: 100%;
+}
+
+/* Remove default scrollable container styles - let inline styles handle it */
+/* .matrix-input form > div:first-child is now handled in MatrixInput.tsx */
+
+/* Mobile scrolling fixes */
+@media (max-width: 767px) {
+    .matrix-input,
+    .step-visualization,
+    .solution-display {
+        overflow-x: visible;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+
+    /* Prevent horizontal scroll on the entire page */
+    body {
+        overflow-x: hidden;
+        width: 100vw;
+    }
+
+    .App {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .content-layer {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .input-column {
+        overflow-x: hidden;
+        width: 100%;
+        padding: 15px;
+    }
+}
+
+/* Improve scrollbar appearance */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}

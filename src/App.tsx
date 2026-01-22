@@ -160,7 +160,7 @@ function App() {
                                 step-by-step solutions.
                             </p>
                             <p style={{ marginTop: '30px', color: '#a2624b', fontSize: '20px', fontWeight: 'bold' }}>
-                                Version 1.2.1
+                                Version 1.2.2
                             </p>
                         </div>
                     )}

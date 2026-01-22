@@ -63,9 +63,7 @@ const SolutionDisplay: React.FC<SolutionDisplayProps> = ({ solution }) => {
                 }}>
                     <h3 style={{ color: '#e65100', marginBottom: '10px' }}>Determinant:</h3>
                     <div style={{ fontSize: '22px', fontWeight: 'bold' }}>
-                        <div style={{ fontSize: '22px', fontWeight: 'bold' }}>
-                            det(A) = {formatNumber(solution.determinant)}
-                        </div>
+                        det(A) = {formatNumber(solution.determinant)}
                     </div>
                 </div>
             )}
@@ -79,8 +77,16 @@ const SolutionDisplay: React.FC<SolutionDisplayProps> = ({ solution }) => {
                     border: '2px solid #2196f3'
                 }}>
                     <h3 style={{ color: '#1565c0', marginBottom: '15px' }}>Inverse Matrix (A⁻¹):</h3>
-                    <div style={{ overflowX: 'auto' }}>
-                        <LaTeXRenderer latex={matrixToLatex(solution.inverse)} display={true} />
+                    <div style={{ 
+                        overflowX: 'auto',
+                        overflowY: 'hidden',
+                        WebkitOverflowScrolling: 'touch',
+                        maxWidth: '100%',
+                        padding: '10px 0'
+                    }}>
+                        <div style={{ display: 'inline-block', minWidth: 'min-content' }}>
+                            <LaTeXRenderer latex={matrixToLatex(solution.inverse)} display={true} />
+                        </div>
                     </div>
                 </div>
             )}
@@ -91,8 +97,16 @@ const SolutionDisplay: React.FC<SolutionDisplayProps> = ({ solution }) => {
                 borderRadius: '8px'
             }}>
                 <h3 style={{ marginBottom: '15px' }}>Final Matrix:</h3>
-                <div style={{ overflowX: 'auto' }}>
-                    <LaTeXRenderer latex={matrixToLatex(solution.finalMatrix)} display={true} />
+                <div style={{ 
+                    overflowX: 'auto',
+                    overflowY: 'hidden',
+                    WebkitOverflowScrolling: 'touch',
+                    maxWidth: '100%',
+                    padding: '10px 0',
+                }}>
+                    <div style={{ display: 'inline-block', minWidth: 'min-content' }}>
+                        <LaTeXRenderer latex={matrixToLatex(solution.finalMatrix)} display={true} />
+                    </div>
                 </div>
             </div>
         </div>

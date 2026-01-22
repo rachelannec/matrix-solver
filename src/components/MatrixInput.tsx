@@ -98,20 +98,23 @@ const MatrixInput: React.FC<MatrixInputProps> = ({ onMatrixInput }) => {
                 {/* Scrollable wrapper for matrix input */}
                 <div style={{
                     overflowX: 'auto',
-                    overflowY: 'auto',
+                    overflowY: 'hidden',
                     maxWidth: '100%',
-                    maxHeight: '500px',
                     marginBottom: '20px',
                     WebkitOverflowScrolling: 'touch',
-                    padding: '10px 0'
+                    padding: '0',
+                    border: '1px solid rgba(204, 204, 204, 0.3)',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.02)'
                 }}>
                     <div style={{ 
-                        display: 'grid', 
+                        display: 'inline-grid', 
                         gridTemplateColumns: `repeat(${cols}, 70px)`,
                         gap: '5px',
-                        justifyContent: 'center',
                         minWidth: 'min-content',
-                        margin: '0 auto'
+                        padding: '15px 20px',
+                        margin: '0 auto',
+                        justifyItems: 'center'
                     }}>
                         {matrixValues.map((row, rowIndex) => (
                             row.map((value, colIndex) => (

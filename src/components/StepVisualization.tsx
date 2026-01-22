@@ -14,11 +14,11 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
         return (
             <div style={{ 
                 overflowX: 'auto',
-                overflowY: 'auto',
+                overflowY: 'hidden',
                 maxWidth: '100%',
-                maxHeight: '400px',
-                WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-                margin: '10px 0'
+                WebkitOverflowScrolling: 'touch',
+                margin: '10px 0',
+                border: '1px solid rgba(51, 51, 51, 0.2)',
             }}>
                 <div style={{ 
                     display: 'inline-block', 
