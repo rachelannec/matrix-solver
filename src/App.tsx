@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+// import Footer from './components/Footer';
 import MatrixInput from './components/MatrixInput';
 import StepVisualization from './components/StepVisualization';
 import SolutionDisplay from './components/SolutionDisplay';
@@ -92,7 +92,7 @@ function App() {
                 )}
             </div>
 
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 }

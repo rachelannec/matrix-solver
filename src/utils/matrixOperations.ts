@@ -149,151 +149,156 @@ const toFraction = (decimal: number): string | null => {
  * @param inputMatrix 
  * @returns Objects with steps array and solution result (as to why objects, bcs we'll use it to display solution and steps, hurraah)
  */
-export const gaussianElimination = (inputMatrix: number[][]): { steps: Step[], result: SolutionResult } => {
-    const steps: Step[] = []; // array to record each operation
-    let matrix = cleanMatrix(copyMatrix(inputMatrix)); // start with clean copy
-    const n = matrix.length; // # of rows
-    const m = matrix[0].length; // # of columns
+export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], result: SolutionResult } {
+    const steps: Step[] = [];
+    const matrix = inputMatrix.map(row => [...row]); // Deep copy
+    const n = matrix.length;
+    const m = matrix[0].length;
     
-    // step 0: record intital state
     steps.push({
-        description: '📋 Initial Matrix - We will transform this into Row Echelon Form using Gaussian Elimination',
-        matrix: copyMatrix(matrix),
+        description: 'Initial augmented matrix',
+        matrix: matrix.map(row => [...row]),
     });
 
-    let currentRow = 0; // track which row we're working on
-    let stepCount = 1; // counter for step numbers
-
-    // Forward elimination - create zeroes below diagonal
-    // loop through columns (left to right)
+    // Forward elimination with partial pivoting
     for (let col = 0; col < Math.min(n, m - 1); col++) {
-        if (currentRow >= n) break;
-
-        steps.push({
-            description: `\n🎯 Working on Column ${col + 1}`,
-            matrix: copyMatrix(matrix),
-            highlightedRows: [currentRow]
-        });
-
-        // ----- Pivoting: find best pivot (largest absolute value)
-        // why? larger pivot reduc numerical error in calculations
-        let pivotRow = currentRow;
-        let maxVal = Math.abs(matrix[currentRow][col]);
+        // Partial pivoting: find row with largest absolute value in current column
+        let maxRow = col;
+        let maxVal = Math.abs(matrix[col][col]);
         
-        for (let row = currentRow + 1; row < n; row++) {
-            if (Math.abs(matrix[row][col]) > maxVal) {
-                maxVal = Math.abs(matrix[row][col]);
-                pivotRow = row;
+        for (let row = col + 1; row < n; row++) {
+            const absVal = Math.abs(matrix[row][col]);
+            if (absVal > maxVal) {
+                maxVal = absVal;
+                maxRow = row;
             }
         }
 
-        // ----- Check: is pivot essentially zero?
-        if (Math.abs(matrix[pivotRow][col]) < 1e-10) {
+        // Swap rows if needed
+        if (maxRow !== col) {
+            [matrix[col], matrix[maxRow]] = [matrix[maxRow], matrix[col]];
             steps.push({
-                description: `⚠️ All entries below Row ${currentRow + 1} in Column ${col + 1} are zero. Moving to next column.`,
-                matrix: copyMatrix(matrix),
-                highlightedRows: [currentRow]
-            });
-            continue; // skip to next column
-        }
-
-        // ----- Swap: move best pivot to current row
-        if (pivotRow !== currentRow) {
-            matrix = swapRows(matrix, currentRow, pivotRow);
-            steps.push({
-                description: `Step ${stepCount++}: 🔄 Swap Row ${currentRow + 1} with Row ${pivotRow + 1}\n` +
-                            `Operation: $R_{${currentRow + 1}} \\leftrightarrow R_{${pivotRow + 1}}$\n` +
-                            `Why? We want the largest value as our pivot for numerical stability.`,
-                matrix: copyMatrix(matrix),
-                highlightedRows: [currentRow, pivotRow],
-                operation: 'swap'
+                description: `Swap R${col + 1} ↔ R${maxRow + 1} (partial pivoting for numerical stability)`,
+                matrix: matrix.map(row => [...row]),
+                highlightedRows: [col, maxRow]
             });
         }
 
-        // ----- Scale: make pivt equal to 1
-        const pivot = matrix[currentRow][col];
-        if (Math.abs(pivot - 1) > 1e-10) { // only scale if pivot isn't already 1
-            const factor = 1 / pivot; // multiplcative inverse
-            const factorStr = formatStepNumber(factor);
-            matrix = multiplyRow(matrix, currentRow, factor);
-            matrix = cleanMatrix(matrix);
-            steps.push({
-                description: `Step ${stepCount++}: ✖️ Scale Row ${currentRow + 1} to make pivot = 1\n` +
-                            `Operation: $R_{${currentRow + 1}} \\rightarrow ${factorStr}R_{${currentRow + 1}}$\n` +
-                            `Goal: Make the pivot element equal to 1`,
-                matrix: copyMatrix(matrix),
-                highlightedRows: [currentRow],
-                operation: 'multiply'
-            });
-        }
-
-        // ----- Eliminate: create zeroes below pivot
-        let eliminationHappened = false;
-        for (let row = currentRow + 1; row < n; row++) {
-            const factor = matrix[row][col]; // vlaue we want to eliminate
-            if (Math.abs(factor) > 1e-10) { // skip if already 0
-                eliminationHappened = true;
-                const factorStr = formatStepNumber(factor);
-
-                // add (-factor) times current row to this row
-                // this makes matrix[row][col] become 0
-                matrix = addRows(matrix, row, currentRow, -factor);
-                matrix = cleanMatrix(matrix);
+        // Check for zero pivot (singular or inconsistent system)
+        if (Math.abs(matrix[col][col]) < 1e-10) {
+            const isZeroRow = matrix[col].slice(0, m - 1).every(val => Math.abs(val) < 1e-10);
+            if (!isZeroRow || Math.abs(matrix[col][m - 1]) > 1e-10) {
                 steps.push({
-                    description: `Step ${stepCount++}: ➖ Eliminate entry at Row ${row + 1}, Column ${col + 1}\n` +
-                                `Operation: $R_{${row + 1}} \\rightarrow R_{${row + 1}} - ${factorStr}R_{${currentRow + 1}}$\n` +
-                                `Goal: Create a zero below the pivot`,
-                    matrix: copyMatrix(matrix),
-                    highlightedRows: [currentRow, row],
-                    operation: 'add'
+                    description: `Row ${col + 1} has zero pivot - system may be singular or inconsistent`,
+                    matrix: matrix.map(row => [...row]),
+                    highlightedRows: [col]
                 });
             }
+            continue;
         }
 
-        if (!eliminationHappened) {
-            steps.push({
-                description: `✅ Column ${col + 1} already has zeros below the pivot!`,
-                matrix: copyMatrix(matrix),
-                highlightedRows: [currentRow]
-            });
-        }
-
-        currentRow++; // move te next row fr next column
-    }
-
-    steps.push({
-        description: '🎉 Row Echelon Form Achieved!\n' +
-                    'The matrix now has a "staircase" pattern with zeros below each leading entry.',
-        matrix: copyMatrix(matrix),
-    });
-
-    // ----- Back Subsitution: solve for variables (if augmented matrix)
-    // augmented matrix: n×(n+1) where last column is constants
-    const solution: number[] = [];
-    if (m === n + 1) {
-        steps.push({
-            description: '🔙 Starting Back Substitution\n' +
-                        'We\'ll solve for variables starting from the bottom row.',
-            matrix: copyMatrix(matrix),
-        });
-
-        // start form bottom row and work up
-        for (let i = n - 1; i >= 0; i--) {
-            // start with the constant (last column)
-            let sum = matrix[i][m - 1];
-
-            // subtract contributions from already-solved variables
-            for (let j = i + 1; j < n; j++) {
-                sum -= matrix[i][j] * solution[n - 1 - j];
+        // Eliminate below current pivot
+        for (let row = col + 1; row < n; row++) {
+            if (Math.abs(matrix[row][col]) < 1e-10) continue;
+            
+            const factor = matrix[row][col] / matrix[col][col];
+            
+            for (let k = col; k < m; k++) {
+                matrix[row][k] -= factor * matrix[col][k];
+                if (Math.abs(matrix[row][k]) < 1e-10) {
+                    matrix[row][k] = 0;
+                }
             }
 
-            // divide by coefficient to get variable value
-            const value = cleanNumber(sum / matrix[i][i]);
-            solution.unshift(value); // add to front of array
+            steps.push({
+                description: `R${row + 1} = R${row + 1} - (${factor.toFixed(4)}) × R${col + 1}`,
+                matrix: matrix.map(row => [...row]),
+                highlightedRows: [row]
+            });
+        }
+    }
+
+    // Analyze the system
+    let hasSolution = true;
+    let hasUniqueSolution = false;
+    let hasInfiniteSolutions = false;
+    const numVariables = m - 1; // Last column is augmented part
+    
+    // Find pivot positions (leading entries in each row)
+    const pivotCols = new Set<number>();
+    let rank = 0;
+    
+    for (let i = 0; i < n; i++) {
+        let leadingCol = -1;
+        
+        // Find first non-zero entry in row
+        for (let j = 0; j < numVariables; j++) {
+            if (Math.abs(matrix[i][j]) > 1e-10) {
+                leadingCol = j;
+                pivotCols.add(j);
+                rank++;
+                break;
+            }
+        }
+        
+        // Check for inconsistency: 0 = non-zero
+        if (leadingCol === -1) {
+            // Zero row in coefficient part
+            if (Math.abs(matrix[i][m - 1]) > 1e-10) {
+                // But non-zero in augmented part: 0 = b (inconsistent)
+                hasSolution = false;
+                steps.push({
+                    description: `Row ${i + 1}: 0 = ${matrix[i][m - 1].toFixed(4)} → No solution (inconsistent system)`,
+                    matrix: matrix.map(row => [...row]),
+                    highlightedRows: [i]
+                });
+                break;
+            }
+        }
+    }
+    
+    if (hasSolution) {
+        // System is consistent
+        if (rank === numVariables) {
+            // Full rank: unique solution
+            hasUniqueSolution = true;
+        } else {
+            // Rank deficient: infinite solutions (free variables exist)
+            hasInfiniteSolutions = true;
+            const numFreeVariables = numVariables - rank;
+            steps.push({
+                description: `System has ${numFreeVariables} free variable${numFreeVariables > 1 ? 's' : ''} → Infinite solutions`,
+                matrix: matrix.map(row => [...row])
+            });
+        }
+    }
+
+    // Back substitution (only if unique solution exists)
+    const solutions: number[] = new Array(numVariables).fill(0);
+    
+    if (hasUniqueSolution) {
+        for (let i = n - 1; i >= 0; i--) {
+            // Find leading coefficient
+            let leadingCol = -1;
+            for (let j = 0; j < numVariables; j++) {
+                if (Math.abs(matrix[i][j]) > 1e-10) {
+                    leadingCol = j;
+                    break;
+                }
+            }
+            
+            if (leadingCol === -1) continue;
+            
+            let sum = matrix[i][m - 1];
+            for (let j = leadingCol + 1; j < numVariables; j++) {
+                sum -= matrix[i][j] * solutions[j];
+            }
+            
+            solutions[leadingCol] = sum / matrix[i][leadingCol];
             
             steps.push({
-                description: `Solved: $x_{${i + 1}} = ${formatStepNumber(value)}$`,
-                matrix: copyMatrix(matrix),
+                description: `x${leadingCol + 1} = ${solutions[leadingCol].toFixed(4)}`,
+                matrix: matrix.map(row => [...row]),
                 highlightedRows: [i]
             });
         }
@@ -303,10 +308,14 @@ export const gaussianElimination = (inputMatrix: number[][]): { steps: Step[], r
         steps,
         result: {
             finalMatrix: matrix,
-            solution: solution.length > 0 ? solution : undefined
+            solution: hasUniqueSolution ? solutions : undefined,
+            determinant: undefined,
+            hasUniqueSolution,
+            hasInfiniteSolutions,
+            hasNoSolution: !hasSolution
         }
     };
-};
+}
 
 /**
  * Gauss-Jordan Elimination - To RREF

@@ -23,4 +23,7 @@ export interface SolutionResult {
     solution?: number[];
     determinant?: number;
     rank?: number;
+    hasUniqueSolution?: boolean;
+    hasInfiniteSolutions?: boolean;
+    hasNoSolution?: boolean;
 }
