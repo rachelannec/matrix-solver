@@ -95,32 +95,44 @@ const MatrixInput: React.FC<MatrixInputProps> = ({ onMatrixInput }) => {
             </div>
 
             <form onSubmit={handleSubmit}>
-                <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: `repeat(${cols}, 70px)`,
-                    gap: '5px',
+                {/* Scrollable wrapper for matrix input */}
+                <div style={{
+                    overflowX: 'auto',
+                    overflowY: 'auto',
+                    maxWidth: '100%',
+                    maxHeight: '500px',
                     marginBottom: '20px',
-                    justifyContent: 'center'
+                    WebkitOverflowScrolling: 'touch',
+                    padding: '10px 0'
                 }}>
-                    {matrixValues.map((row, rowIndex) => (
-                        row.map((value, colIndex) => (
-                            <input
-                                key={`${rowIndex}-${colIndex}`}
-                                type="text"
-                                value={value}
-                                onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                                placeholder="0"
-                                style={{
-                                    width: '60px',
-                                    height: '40px',
-                                    textAlign: 'center',
-                                    fontSize: '14px',
-                                    border: '1px solid #ccc',
-                                    borderRadius: '4px'
-                                }}
-                            />
-                        ))
-                    ))}
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: `repeat(${cols}, 70px)`,
+                        gap: '5px',
+                        justifyContent: 'center',
+                        minWidth: 'min-content',
+                        margin: '0 auto'
+                    }}>
+                        {matrixValues.map((row, rowIndex) => (
+                            row.map((value, colIndex) => (
+                                <input
+                                    key={`${rowIndex}-${colIndex}`}
+                                    type="text"
+                                    value={value}
+                                    onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
+                                    placeholder="0"
+                                    style={{
+                                        width: '60px',
+                                        height: '40px',
+                                        textAlign: 'center',
+                                        fontSize: '14px',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            ))
+                        ))}
+                    </div>
                 </div>
                 
                 {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}

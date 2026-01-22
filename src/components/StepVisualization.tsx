@@ -9,79 +9,57 @@ interface StepVisualizationProps {
 
 const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
     const [currentStep, setCurrentStep] = useState<number>(0);
-    // const [useLatex, setUseLatex] = useState<boolean>(true);
-
-    // Helper function to parse description and render LaTeX inline
-    // const renderDescription = (description: string) => {
-    //     if (!description || description.trim() === '') {
-    //         return <div style={{ fontStyle: 'italic', color: '#222' }}>No description available</div>;
-    //     }
-
-    //     if (!useLatex) {
-    //         return <div style={{ whiteSpace: 'pre-line' }}>{description}</div>;
-    //     }
-
-    //     // Split by LaTeX delimiters $...$ for inline math
-    //     const parts = description.split(/(\$[^$]+\$)/g);
-        
-    //     return (
-    //         <div style={{ whiteSpace: 'pre-line' }}>
-    //             {parts.map((part, index) => {
-    //                 if (part.startsWith('$') && part.endsWith('$')) {
-    //                     // Extract LaTeX content (remove the $ delimiters)
-    //                     const latex = part.slice(1, -1);
-    //                     return (
-    //                         <span key={index} style={{ display: 'inline-block', margin: '0 4px', verticalAlign: 'middle' }}>
-    //                             <LaTeXRenderer latex={latex} />
-    //                         </span>
-    //                     );
-    //                 }
-    //                 return <span key={index}>{part}</span>;
-    //             })}
-    //         </div>
-    //     );
-    // };
 
     const renderMatrix = (matrix: number[][], highlightedRows?: number[]) => {
         return (
             <div style={{ 
-                display: 'inline-block', 
-                border: '2px solid #333',
-                borderRadius: '5px',
-                padding: '10px',
+                overflowX: 'auto',
+                overflowY: 'auto',
+                maxWidth: '100%',
+                maxHeight: '400px',
+                WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
                 margin: '10px 0'
             }}>
-                <table style={{ borderCollapse: 'collapse' }}>
-                    <tbody>
-                        {matrix.map((row, rowIndex) => (
-                            <tr 
-                                key={rowIndex}
-                                style={{
-                                    backgroundColor: highlightedRows?.includes(rowIndex) 
-                                        ? '#6561478b' 
-                                        : 'transparent',
-                                    transition: 'background-color 0.3s'
-                                }}
-                            >
-                                {row.map((value, colIndex) => (
-                                    <td 
-                                        key={colIndex}
-                                        style={{
-                                            padding: '10px 15px',
-                                            textAlign: 'center',
-                                            minWidth: '70px',
-                                            fontFamily: 'monospace',
-                                            fontSize: '16px',
-                                            fontWeight: highlightedRows?.includes(rowIndex) ? 'bold' : 'normal'
-                                        }}
-                                    >
-                                        {formatNumber(value)}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div style={{ 
+                    display: 'inline-block', 
+                    border: '2px solid #333',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    minWidth: 'min-content'
+                }}>
+                    <table style={{ borderCollapse: 'collapse' }}>
+                        <tbody>
+                            {matrix.map((row, rowIndex) => (
+                                <tr 
+                                    key={rowIndex}
+                                    style={{
+                                        backgroundColor: highlightedRows?.includes(rowIndex) 
+                                            ? '#6561478b' 
+                                            : 'transparent',
+                                        transition: 'background-color 0.3s'
+                                    }}
+                                >
+                                    {row.map((value, colIndex) => (
+                                        <td 
+                                            key={colIndex}
+                                            style={{
+                                                padding: '10px 15px',
+                                                textAlign: 'center',
+                                                minWidth: '70px',
+                                                fontFamily: 'monospace',
+                                                fontSize: '16px',
+                                                fontWeight: highlightedRows?.includes(rowIndex) ? 'bold' : 'normal',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            {formatNumber(value)}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     };
@@ -94,18 +72,6 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
     return (
         <div className="step-visualization">
             <h2>Solution Steps</h2>
-            
-            {/* <div style={{ marginBottom: '20px' }}>
-                <label style={{ marginRight: '20px', cursor: 'pointer', color: '#eee' }}>
-                    <input 
-                        type="checkbox" 
-                        checked={useLatex}
-                        onChange={(e) => setUseLatex(e.target.checked)}
-                        style={{ cursor: 'pointer' }}
-                    />
-                    {' '}Use LaTeX Rendering
-                </label>
-            </div> */}
             
             <div style={{ marginBottom: '20px' }}>
                 <button 
@@ -141,7 +107,8 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                 borderRadius: '8px',
                 padding: '25px',
                 minHeight: '250px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                overflow: 'hidden'
             }}>
                 <h3 style={{ color: '#cda95cff', marginBottom: '15px' }}>
                     Step {currentStep + 1}
@@ -151,9 +118,10 @@ const StepVisualization: React.FC<StepVisualizationProps> = ({ steps }) => {
                     marginBottom: '20px',
                     color: '#333',
                     lineHeight: '1.8',
-                    minHeight: '40px'
+                    minHeight: '40px',
+                    whiteSpace: 'pre-wrap'
                 }}>
-                    {/* {renderDescription(steps[currentStep].description)} */}
+                    {steps[currentStep].description}
                 </div>
                 {renderMatrix(steps[currentStep].matrix, steps[currentStep].highlightedRows)}
             </div>
