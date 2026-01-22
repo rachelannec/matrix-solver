@@ -64,10 +64,6 @@ function App() {
             <div className="container">
                 {currentTab === 'solver' && (
                     <>
-                        {/* <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '32px' }}>
-                            Matrix Solver
-                        </h1> */}
-                        
                         <div className="solver-layout">
                             {/* Left Column: Input */}
                             <div className="input-column">
@@ -80,8 +76,67 @@ function App() {
 
                             {/* Right Column: Steps & Solution */}
                             <div className="output-column">
-                                {steps.length > 0 && <StepVisualization steps={steps} />}
-                                {solution && <SolutionDisplay solution={solution} />}
+                                {steps.length > 0 ? (
+                                    <>
+                                        <StepVisualization steps={steps} />
+                                        {solution && <SolutionDisplay solution={solution} />}
+                                    </>
+                                ) : (
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        minHeight: '400px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                        borderRadius: '12px',
+                                        padding: '60px 40px',
+                                        textAlign: 'center',
+                                        border: '2px dashed rgba(255, 255, 255, 0.2)'
+                                    }}>
+                                        <div style={{
+                                            fontSize: '72px',
+                                            marginBottom: '20px',
+                                            opacity: 0.3
+                                        }}>
+                                            📊
+                                        </div>
+                                        <h2 style={{ 
+                                            color: '#aaa', 
+                                            marginBottom: '15px',
+                                            fontSize: '28px',
+                                            fontWeight: '500'
+                                        }}>
+                                            Ready to Solve
+                                        </h2>
+                                        <p style={{ 
+                                            color: '#888', 
+                                            fontSize: '16px',
+                                            lineHeight: '1.6',
+                                            maxWidth: '500px'
+                                        }}>
+                                            Enter your matrix values on the left, select an operation, 
+                                            and click <strong style={{ color: '#667eea' }}>Solve</strong> to see 
+                                            step-by-step solutions appear here.
+                                        </p>
+                                        <div style={{
+                                            marginTop: '30px',
+                                            padding: '15px 25px',
+                                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(102, 126, 234, 0.3)'
+                                        }}>
+                                            <p style={{ 
+                                                color: '#667eea', 
+                                                fontSize: '14px',
+                                                margin: 0,
+                                                fontWeight: '500'
+                                            }}>
+                                                💡 Tip: Start with a simple 3×3 matrix to get familiar
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </>
@@ -98,7 +153,7 @@ function App() {
                             step-by-step solutions.
                         </p>
                         <p style={{ marginTop: '30px', color: '#a2624b', fontSize: '20px', fontWeight: 'bold' }}>
-                            Version 1.1.0
+                            Version 1.2.0
                         </p>
                     </div>
                 )}

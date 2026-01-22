@@ -8,6 +8,89 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ---
+## [v1.2.0] - 2025-01-22 - Algorithm Improvements & Responsive Design
+
+### Added
+- **Enhanced Gaussian Elimination Algorithm**
+  - Partial pivoting for improved numerical stability
+  - Better handling of singular and inconsistent systems
+  - Detection of infinite solutions (free variables)
+  - Epsilon tolerance (1e-10) for floating-point precision
+  - Clear error messages for inconsistent systems (0 = b)
+  
+- **Solution State Detection**
+  - `hasUniqueSolution` flag for systems with one solution
+  - `hasInfiniteSolutions` flag for underdetermined systems
+  - `hasNoSolution` flag for inconsistent systems
+  - Proper rank calculation and free variable counting
+
+- **Inverse Matrix Error Handling**
+  - Clear error messages for singular matrices
+  - Validation that matrix determinant ≠ 0
+  - Explanation of why inverse doesn't exist
+  - Proper undefined return for non-invertible matrices
+
+- **Responsive Design Enhancements**
+  - Two-column layout for desktop/laptop (≥1024px)
+  - Single-column layout for mobile and tablet
+  - Sticky input column on desktop for better UX
+  - Horizontal scrolling for large matrices
+  - Vertical scrolling with max-height constraints
+
+### Changed
+- **Matrix Display**
+  - Input matrix grid now horizontally scrollable
+  - Step visualization matrices scroll independently
+  - Mobile-optimized touch scrolling
+  - Improved overflow handling for all screen sizes
+
+- **Layout Structure**
+  - Reorganized App.tsx with two-column grid layout
+  - Left column: Operation selector + Matrix input (sticky on desktop)
+  - Right column: Solution steps + Final answer
+  - Responsive breakpoints at 768px and 1024px
+
+- **Solution Display Component**
+  - Error-first rendering (checks for errors before displaying results)
+  - Better error styling with red-themed alerts
+  - Improved visual hierarchy for different result types
+  - Clear distinction between unique, infinite, and no solutions
+
+### Fixed
+- **Type Safety**
+  - Added missing properties to `SolutionResult` interface:
+    - `hasUniqueSolution?: boolean`
+    - `hasInfiniteSolutions?: boolean`
+    - `hasNoSolution?: boolean`
+    - `inverse?: number[][]`
+    - `error?: string`
+  
+- **Algorithm Correctness**
+  - Fixed unique solution detection logic (rank === numVariables)
+  - Corrected back substitution to only run for unique solutions
+  - Fixed inconsistency detection in row echelon form
+  - Improved zero-row handling in Gaussian elimination
+
+- **UI/UX Issues**
+  - Restored step descriptions in visualization
+  - Fixed matrix input scrolling behavior
+  - Prevented input column from scrolling with page
+  - Improved mobile responsiveness
+
+### Improved
+- **Code Quality**
+  - Better separation of concerns in components
+  - More descriptive variable names
+  - Enhanced error handling throughout
+  - Cleaner conditional rendering logic
+
+- **User Experience**
+  - Clearer error messages for invalid operations
+  - Better feedback for singular matrices
+  - Improved step-by-step explanations
+  - More intuitive desktop layout
+  
+---
 
 ## [v1.1.0] - 2024-12-26 - Documentation & UI Enhancements
 
