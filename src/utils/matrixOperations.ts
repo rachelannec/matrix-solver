@@ -89,7 +89,7 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
     const m = matrix[0].length;
     
     steps.push({
-        description: 'Initial augmented matrix',
+        description: 'Starting Point: This is your original augmented matrix.\n\nOur goal: Transform it step-by-step into Row Echelon Form (REF) to solve the system of equations.',
         matrix: matrix.map(row => [...row]),
     });
 
@@ -111,7 +111,7 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
         if (maxRow !== col) {
             [matrix[col], matrix[maxRow]] = [matrix[maxRow], matrix[col]];
             steps.push({
-                description: `Swap R${col + 1} ↔ R${maxRow + 1}`,
+                description: `Row Swap: Moving R${maxRow + 1} to position ${col + 1}\n\nWhy? We want the largest absolute value in column ${col + 1} as the pivot. This improves numerical stability and reduces rounding errors in calculations.`,
                 matrix: matrix.map(row => [...row]),
                 highlightedRows: [col, maxRow]
             });
@@ -122,7 +122,7 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
             const isZeroRow = matrix[col].slice(0, m - 1).every(val => Math.abs(val) < 1e-10);
             if (!isZeroRow || Math.abs(matrix[col][m - 1]) > 1e-10) {
                 steps.push({
-                    description: `Row ${col + 1} has zero pivot`,
+                    description: `Problem Detected: Row ${col + 1} has a zero in the pivot position.\n\nThis indicates the system might have no solution or infinitely many solutions. We'll continue the process to determine which case applies.`,
                     matrix: matrix.map(row => [...row]),
                     highlightedRows: [col]
                 });
@@ -144,7 +144,7 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
             }
 
             steps.push({
-                description: `R${row + 1} = R${row + 1} - (${factor.toFixed(2)}) × R${col + 1}`,
+                description: `Elimination Step: Creating a zero in position (${row + 1}, ${col + 1})\n\nOperation: R${row + 1} = R${row + 1} - (${factor.toFixed(2)}) × R${col + 1}\n\nWhy? We're systematically creating zeros below each pivot element. This forms a "staircase" pattern that makes the system easier to solve.`,
                 matrix: matrix.map(row => [...row]),
                 highlightedRows: [row]
             });
@@ -176,7 +176,7 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
             if (Math.abs(matrix[i][m - 1]) > 1e-10) {
                 hasSolution = false;
                 steps.push({
-                    description: `Row ${i + 1}: 0 = ${matrix[i][m - 1].toFixed(2)} → No solution`,
+                    description: `Contradiction Found in Row ${i + 1}\n\nThis row says: 0 = ${matrix[i][m - 1].toFixed(2)}\n\nMeaning: The system has NO SOLUTION. The equations contradict each other and cannot all be satisfied simultaneously. This is called an "inconsistent system."`,
                     matrix: matrix.map(row => [...row]),
                     highlightedRows: [i]
                 });
@@ -188,11 +188,15 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
     if (hasSolution) {
         if (rank === numVariables) {
             hasUniqueSolution = true;
+            steps.push({
+                description: `Analysis Complete: The system has exactly ONE UNIQUE SOLUTION.\n\nWe have ${rank} pivot positions for ${numVariables} variables, which means every variable can be uniquely determined.\n\nNext: We'll use back-substitution to find the actual values of each variable.`,
+                matrix: matrix.map(row => [...row])
+            });
         } else {
             hasInfiniteSolutions = true;
             const numFreeVariables = numVariables - rank;
             steps.push({
-                description: `System has ${numFreeVariables} free variable${numFreeVariables > 1 ? 's' : ''} → Infinite solutions`,
+                description: `Analysis Complete: The system has INFINITELY MANY SOLUTIONS.\n\nWe have ${rank} pivot positions but ${numVariables} variables. This creates ${numFreeVariables} free variable${numFreeVariables > 1 ? 's' : ''}.\n\nFree variables can take any value, and the other variables are expressed in terms of them. This represents a line or plane of solutions.`,
                 matrix: matrix.map(row => [...row])
             });
         }
@@ -221,7 +225,7 @@ export function gaussianElimination(inputMatrix: number[][]): { steps: Step[], r
             solutions[leadingCol] = sum / matrix[i][leadingCol];
             
             steps.push({
-                description: `x${leadingCol + 1} = ${solutions[leadingCol].toFixed(2)}`,
+                description: `Back-Substitution: Solving for x${leadingCol + 1}\n\nFrom row ${i + 1}: x${leadingCol + 1} = ${solutions[leadingCol].toFixed(2)}\n\nWe start from the bottom row and work upward, substituting known values to find each unknown variable.`,
                 matrix: matrix.map(row => [...row]),
                 highlightedRows: [i]
             });
@@ -251,7 +255,7 @@ export const gaussJordan = (inputMatrix: number[][]): { steps: Step[], result: S
     const m = matrix[0].length;
     
     steps.push({
-        description: 'Initial Matrix',
+        description: 'Starting Point: Your original matrix.\n\nGoal: Transform this into Reduced Row Echelon Form (RREF), where each leading 1 is the only non-zero entry in its column. This makes the solution immediately readable.',
         matrix: copyMatrix(matrix),
     });
 
@@ -277,7 +281,7 @@ export const gaussJordan = (inputMatrix: number[][]): { steps: Step[], result: S
         if (pivotRow !== row) {
             matrix = swapRows(matrix, row, pivotRow);
             steps.push({
-                description: `Swap R${row + 1} ↔ R${pivotRow + 1}`,
+                description: `Row Swap: Moving R${pivotRow + 1} to position ${row + 1}\n\nWhy? We need a non-zero element in the current pivot position to proceed with the elimination process.`,
                 matrix: copyMatrix(matrix),
                 highlightedRows: [row, pivotRow]
             });
@@ -290,7 +294,7 @@ export const gaussJordan = (inputMatrix: number[][]): { steps: Step[], result: S
             matrix = multiplyRow(matrix, row, factor);
             matrix = cleanMatrix(matrix);
             steps.push({
-                description: `R${row + 1} = R${row + 1} × ${factor.toFixed(2)}`,
+                description: `Scaling Row ${row + 1}: Making the pivot equal to 1\n\nOperation: R${row + 1} = R${row + 1} × ${factor.toFixed(2)}\n\nWhy? In RREF, every pivot position must contain the value 1. This is achieved by dividing the entire row by the pivot value.`,
                 matrix: copyMatrix(matrix),
                 highlightedRows: [row]
             });
@@ -305,7 +309,7 @@ export const gaussJordan = (inputMatrix: number[][]): { steps: Step[], result: S
                     matrix = cleanMatrix(matrix);
                     
                     steps.push({
-                        description: `R${i + 1} = R${i + 1} - (${factor.toFixed(2)}) × R${row + 1}`,
+                        description: `Clearing Column ${lead + 1}: Making entry (${i + 1}, ${lead + 1}) equal to zero\n\nOperation: R${i + 1} = R${i + 1} - (${factor.toFixed(2)}) × R${row + 1}\n\nWhy? In RREF, each leading 1 must be the ONLY non-zero entry in its entire column (not just below, but above too). This makes solutions directly readable.`,
                         matrix: copyMatrix(matrix),
                         highlightedRows: [row, i]
                     });
@@ -317,7 +321,7 @@ export const gaussJordan = (inputMatrix: number[][]): { steps: Step[], result: S
     }
 
     steps.push({
-        description: 'RREF achieved',
+        description: 'RREF Achieved: The matrix is now in its simplest form.\n\nEach non-zero row starts with a leading 1, and each leading 1 is the only non-zero entry in its column. Variables can now be read directly from the rightmost column.',
         matrix: copyMatrix(matrix),
     });
 
@@ -350,7 +354,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
     // Validation
     if (n !== matrix[0].length) {
         steps.push({
-            description: 'Error: Determinant only exists for square matrices',
+            description: 'Error: Determinants only exist for square matrices.\n\nYour matrix must have the same number of rows and columns to calculate a determinant.',
             matrix: copyMatrix(matrix),
         });
         return {
@@ -363,7 +367,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
     }
 
     steps.push({
-        description: 'Initial Matrix',
+        description: 'Starting Determinant Calculation\n\nStrategy: We\'ll transform the matrix to upper triangular form using row operations. The determinant equals the product of the diagonal entries, adjusted for any row swaps we perform.',
         matrix: copyMatrix(matrix),
     });
 
@@ -383,7 +387,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
         // Check for zero pivot
         if (Math.abs(matrix[pivotRow][col]) < 1e-10) {
             steps.push({
-                description: 'Determinant = 0 (zero column detected)',
+                description: 'Zero Column Detected: Determinant = 0\n\nWhen an entire column becomes zero during elimination, the determinant is automatically zero. This means:\n- The matrix is singular (not invertible)\n- The rows/columns are linearly dependent\n- The matrix has no unique inverse',
                 matrix: copyMatrix(matrix),
                 highlightedRows: [col]
             });
@@ -402,7 +406,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
             swapCount++;
             determinant *= -1;
             steps.push({
-                description: `Swap R${col + 1} ↔ R${pivotRow + 1} (det sign changes)`,
+                description: `Row Swap: R${col + 1} ↔ R${pivotRow + 1}\n\nImportant: Each row swap multiplies the determinant by -1.\nCurrent determinant sign: ${determinant > 0 ? 'positive' : 'negative'}\n\nThis is a fundamental property: swapping two rows changes the sign of the determinant.`,
                 matrix: copyMatrix(matrix),
                 highlightedRows: [col, pivotRow]
             });
@@ -413,7 +417,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
         determinant *= pivot;
 
         steps.push({
-            description: `Pivot = ${pivot.toFixed(2)}, running det = ${determinant.toFixed(2)}`,
+            description: `Tracking the Determinant:\n\nCurrent pivot value: ${pivot.toFixed(2)}\nRunning product: ${determinant.toFixed(2)}\n\nThe determinant is the product of all diagonal entries in the triangular form. We multiply as we go to keep track of the final value.`,
             matrix: copyMatrix(matrix),
             highlightedRows: [col]
         });
@@ -425,7 +429,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
                 matrix = addRows(matrix, row, col, -factor);
                 matrix = cleanMatrix(matrix);
                 steps.push({
-                    description: `R${row + 1} = R${row + 1} - (${factor.toFixed(2)}) × R${col + 1}`,
+                    description: `Elimination: Creating zero at position (${row + 1}, ${col + 1})\n\nOperation: R${row + 1} = R${row + 1} - (${factor.toFixed(2)}) × R${col + 1}\n\nNote: This type of row operation (adding a multiple of one row to another) does NOT change the determinant value. Only the row swaps affect the sign.`,
                     matrix: copyMatrix(matrix),
                     highlightedRows: [col, row]
                 });
@@ -436,7 +440,7 @@ export const calculateDeterminant = (inputMatrix: number[][]): { steps: Step[], 
     determinant = cleanNumber(determinant);
 
     steps.push({
-        description: `Final determinant = ${determinant.toFixed(2)}`,
+        description: `Final Result: Determinant = ${determinant.toFixed(2)}\n\nInterpretation:\n${determinant === 0 ? '- The matrix is SINGULAR (not invertible)\n- The columns are linearly dependent\n- The transformation collapses space to a lower dimension' : '- The matrix is INVERTIBLE\n- The columns are linearly independent\n- The transformation preserves dimensionality'}\n\n${swapCount > 0 ? `We performed ${swapCount} row swap${swapCount > 1 ? 's' : ''}, which affected the final sign.` : 'No row swaps were needed.'}`,
         matrix: copyMatrix(matrix),
     });
 
@@ -459,7 +463,7 @@ export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], resu
     // Validation
     if (n !== inputMatrix[0].length) {
         steps.push({
-            description: 'Error: Only square matrices have inverses',
+            description: 'Error: Only square matrices can have inverses.\n\nYour matrix must have the same number of rows and columns. Non-square matrices don\'t have multiplicative inverses in the traditional sense.',
             matrix: copyMatrix(inputMatrix),
         });
         return {
@@ -478,7 +482,7 @@ export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], resu
     ]);
 
     steps.push({
-        description: 'Augmented matrix [A | I]',
+        description: 'Setting Up: Creating Augmented Matrix [A | I]\n\nLeft side: Your original matrix (A)\nRight side: Identity matrix (I)\n\nStrategy: If we can transform the left side into the identity matrix using row operations, the right side will become A⁻¹. This works because the same operations that transform A into I will transform I into A⁻¹.',
         matrix: copyMatrix(augmented),
     });
 
@@ -495,7 +499,7 @@ export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], resu
 
     if (!isIdentity) {
         steps.push({
-            description: 'Matrix is singular (not invertible)',
+            description: 'Matrix is Singular: No Inverse Exists\n\nThe left side could not be transformed into the identity matrix. This means:\n- The determinant is zero\n- The matrix is not invertible\n- The rows are linearly dependent\n- The transformation is not reversible\n\nOnly matrices with non-zero determinants have inverses.',
             matrix: result.result.finalMatrix
         });
         return {
@@ -512,7 +516,7 @@ export const calculateInverse = (inputMatrix: number[][]): { steps: Step[], resu
     const inverse = result.result.finalMatrix.map(row => row.slice(n));
     
     steps.push({
-        description: 'Inverse matrix found',
+        description: 'Success: Inverse Matrix Found\n\nThe right side of our augmented matrix is now A⁻¹ (the inverse of A).\n\nVerification: If you multiply A × A⁻¹, you will get the identity matrix I. This confirms that A⁻¹ is indeed the inverse.\n\nUse: The inverse is useful for solving matrix equations of the form AX = B, where X = A⁻¹B.',
         matrix: inverse
     });
 
